@@ -1,0 +1,6 @@
+locales/*.json
+locales/*.mo
+locales/languages.txt
+locales/*.pot
+
+res/*sprite*

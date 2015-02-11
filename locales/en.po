@@ -1,0 +1,84 @@
+# Language: English
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-11 16:28+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Adam Jordanek <dotevo@gmail.com>\n"
+"Language-Team: \n"
+"Language: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: ../js/main.js:214
+#, perl-format
+msgid "Map data &copy; %s contributors"
+msgstr "Map data &copy; %s contributors"
+
+#: ../js/main.js:215
+#, perl-format
+msgid "Uses %s"
+msgstr "Uses %s"
+
+msgid "Colour on the map means trail colour"
+msgstr "Colour on the map means trail colour"
+
+msgid "Cycleway"
+msgstr "Cycleway"
+
+msgid "Cycleways"
+msgstr "Cycleways"
+
+msgid "Hazard"
+msgstr "Hazard"
+
+msgid "Hazards"
+msgstr "Hazards"
+
+msgid "Hover over the button"
+msgstr "Hover over the button"
+
+msgid "Lane"
+msgstr "Lane"
+
+msgid "Loading"
+msgstr "Loading"
+
+msgid "Not a one-way road for bicycles"
+msgstr "Not a one-way road for bicycles"
+
+msgid "Opposite lane"
+msgstr "Opposite lane"
+
+msgid "Parking"
+msgstr "Parking"
+
+msgid "Please, zoom in"
+msgstr "Please, zoom in"
+
+msgid "POIs"
+msgstr "POIs"
+
+msgid "Repair station"
+msgstr "Repair station"
+
+msgid "Shared cycle way"
+msgstr "Shared cycle way"
+
+msgid "Shop"
+msgstr "Shop"
+
+msgid "Trails"
+msgstr "Trails"
+
+#~ msgid "index.lanes"
+#~ msgstr "Lanes"
+
+#~ msgid "index.parkings"
+#~ msgstr "Parkings"
+
+#~ msgid "index.shops"
+#~ msgstr "Shops"

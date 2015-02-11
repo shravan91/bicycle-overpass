@@ -1,0 +1,81 @@
+# Language: Polski
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-11 16:28+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Adam Jordanek <dotevo@gmail.com>\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: ../js/main.js:214
+#, perl-format
+msgid "Map data &copy; %s contributors"
+msgstr "Dane mapy &copy; %s autorzy"
+
+#: ../js/main.js:215
+#, perl-format
+msgid "Uses %s"
+msgstr "Używa %s"
+
+msgid "Colour on the map means trail colour"
+msgstr "Kolor na mapie oznacza kolor szlaku"
+
+msgid "Cycleway"
+msgstr "Ścieżka rowerowa"
+
+msgid "Cycleways"
+msgstr "Ścieżki rowerowe"
+
+msgid "Hazard"
+msgstr "Utrudnienie"
+
+msgid "Hazards"
+msgstr "Zagrożenia"
+
+msgid "Hover over the button"
+msgstr "Najedź kursorem na przycisk"
+
+msgid "Lane"
+msgstr "Pas"
+
+msgid "Loading"
+msgstr "Ładowanie"
+
+msgid "Not a one-way road for bicycles"
+msgstr "Jeden kierunek nie dla rowerów"
+
+msgid "Opposite lane"
+msgstr "Kontrapas"
+
+msgid "Parking"
+msgstr "Parking"
+
+msgid "Please, zoom in"
+msgstr "Przybliż proszę"
+
+msgid "POIs"
+msgstr "Punkty"
+
+msgid "Repair station"
+msgstr "Stacja naprawcza"
+
+msgid "Shared cycle way"
+msgstr "Współdzielona ścieżka"
+
+msgid "Shop"
+msgstr "Sklep"
+
+msgid "Trails"
+msgstr "Szlaki"
+
+#~ msgid "lanes"
+#~ msgstr "Pasy"
+
+#~ msgid "shops"
+#~ msgstr "Sklepy"
