@@ -45,20 +45,23 @@ L.OwnLayersPack = L.Class.extend({
 		//Way
 		this._wayLayer = L.featureGroup();
 		this._addWayPart();
-	/*	this._waysZoomedLayer = L.featureGroup();
+		this.wayzoomlevel = 18;
+		this._waysZoomedLayer = L.featureGroup();
 		this.options.map.on("zoomend",function(){
-				if(_this.options.map.getZoom() > 17){
-					_this.options.map.addLayer(_this._waysZoomedLayer);
+				if(_this.options.map.getZoom() < _this.wayzoomlevel){
+					_this._hideLayer(_this._waysZoomedLayer);
+					_this._showLayer(_this._wayLayer);
 				}else{
-					_this.options.map.removeLayer(_this._waysZoomedLayer);
+					_this._showLayer(_this._waysZoomedLayer);
+					_this._hideLayer(_this._wayLayer);
 				}
-			});*/
+			});
 		//Trail
 		this._trailLayer = L.featureGroup();
 		this._addTrailPart();
 	},
 
-	_hideLayer: function(layer,layer2){
+	_hideLayer: function(layer){
 		if(this.options.map.hasLayer(layer))
 			this.options.map.removeLayer(layer);
 	},
@@ -123,12 +126,16 @@ L.OwnLayersPack = L.Class.extend({
 	},
 
 	hideWayLayer: function(){
+		this._hideLayer(this._waysZoomedLayer);
 		this._hideLayer(this._wayLayer);
 		this._hideLayer(this._wayfetcher);
 	},
 
 	showWayLayer: function(){
-		this._showLayer(this._wayLayer);
+		if(this.options.map.getZoom() >= this.wayzoomlevel)
+			this._showLayer(this._waysZoomedLayer);
+		else
+			this._showLayer(this._wayLayer);
 		this._showLayer(this._wayfetcher);
 	},
 
@@ -193,6 +200,27 @@ L.OwnLayersPack = L.Class.extend({
 		return false;
 	},
 
+	_addLanes: function(ll,el){
+		if(this._checkTag(el.tags,"bicycle:lanes","designated","~")){
+			var lanes = el.tags["bicycle:lanes"].split("|");
+			var i = 0;
+			for(var lane in lanes){
+				var n = L.polyline( ll);
+				if(lanes[lane] == 'no')
+					n.setStyle({'color': 'black'});
+				else if(lanes[lane] == 'yes')
+					n.setStyle({'color': 'blue'});
+				else if(lanes[lane] == 'designated'){
+					n.setStyle({'color': 'red'});
+					console.log('red');
+				}
+				n.setOffset((i-lanes.length/2+1)*5);
+				this._waysZoomedLayer.addLayer(n);
+				++i;
+			}
+		}
+	},
+
 	_createWay: function(ll,el){
 		var feature = L.polyline( ll);
 		var color = "blue";
@@ -234,6 +262,8 @@ L.OwnLayersPack = L.Class.extend({
 		if(this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"highway","cycleway",'=') && this._checkTag(el.tags,"segregated","yes",'!='))
 			color = 'purple';
 
+		this._addLanes(ll,el);
+
 		feature.setStyle({'color':color});
 		return feature;
 	},
@@ -242,10 +272,8 @@ L.OwnLayersPack = L.Class.extend({
 		var rlength = Object.size(el.relations);
 		var i = 0;
 		for(var rel in el.relations){
-			console.log(el.relations[rel]);
 			var n = L.polyline( ll);
 			var color = el.relations[rel].tags["colour"];
-			console.log(color);
 			n.setStyle({'color': color});
 		
 			n.setOffset((i-rlength+1)*6);
