@@ -25,7 +25,7 @@ then
         echo -e "\tbackground-position:0 -${offset}px;" >> $css;
         echo -e "\twidth: ${width}px;" >> $css;
         echo -e "\theight: ${height}px;\n}" >> $css;
-        echo -e "<a href=\"#\" class=\"$classname-$clean\"></a>\n" >> $html;
+        echo -e "<a href=\"#\" class=\"$classname $classname-$clean\"></a>\n" >> $html;
         let offset+=$height;
         let counter+=1;
     done

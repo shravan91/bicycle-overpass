@@ -206,15 +206,16 @@ L.OwnLayersPack = L.Class.extend({
 			var i = 0;
 			for(var lane in lanes){
 				var n = L.polyline( ll);
+				var color;
 				if(lanes[lane] == 'no')
-					n.setStyle({'color': 'black'});
+					color = 'black';
 				else if(lanes[lane] == 'yes')
-					n.setStyle({'color': 'blue'});
-				else if(lanes[lane] == 'designated'){
-					n.setStyle({'color': 'red'});
-					console.log('red');
-				}
-				n.setOffset((i-lanes.length/2+1)*5);
+					color = 'blue';
+				else if(lanes[lane] == 'designated')
+					color = 'red';
+
+				n.setStyle({'color': color,'opacity':1,'weight':8});
+				n.setOffset((i-lanes.length/2+1)*10);
 				this._waysZoomedLayer.addLayer(n);
 				++i;
 			}
@@ -264,7 +265,7 @@ L.OwnLayersPack = L.Class.extend({
 
 		this._addLanes(ll,el);
 
-		feature.setStyle({'color':color});
+		feature.setStyle({'color':color, 'opacity':1});
 		return feature;
 	},
 	_createTrail: function (ll,el){
@@ -274,7 +275,7 @@ L.OwnLayersPack = L.Class.extend({
 		for(var rel in el.relations){
 			var n = L.polyline( ll);
 			var color = el.relations[rel].tags["colour"];
-			n.setStyle({'color': color});
+			n.setStyle({'color': color,'opacity':1});
 		
 			n.setOffset((i-rlength+1)*6);
 			array.push(n);
