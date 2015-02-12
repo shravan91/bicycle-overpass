@@ -49,10 +49,12 @@ L.OwnLayersPack = L.Class.extend({
 		this._waysZoomedLayer = L.featureGroup();
 		console.log(this.options.map);
 		this.options.map.on("zoomend",function(){
-				if(_this.options.map.getZoom() < _this.wayzoomlevel && _this.options.map.hasLayer(_this._waysZoomedLayer) ){
-					_this._hideLayer(_this._waysZoomedLayer);
-					_this._showLayer(_this._wayLayer);
-				}else if(_this.options.map.hasLayer(_this._waysLayer)){
+				if(_this.options.map.getZoom() < _this.wayzoomlevel ){
+					if(_this.options.map.hasLayer(_this._waysZoomedLayer)){
+						_this._hideLayer(_this._waysZoomedLayer);
+						_this._showLayer(_this._wayLayer);
+					}
+				}else if(_this.options.map.hasLayer(_this._wayLayer)){
 					_this._showLayer(_this._waysZoomedLayer);
 					_this._hideLayer(_this._wayLayer);
 				}
@@ -329,46 +331,39 @@ L.OwnLayersPack = L.Class.extend({
 	_createWay: function(ll,el){
 		var feature = L.polyline( ll);
 		var color = "blue";
-		//TODO I CAN DO IT MUCH BETTER
-		if(this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","yes",'='))
-			color = 'yellow';
-		if(this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","-1",'='))
-			color = 'yellow';
 
-		if(this._checkTag(el.tags,"cycleway:left","lane",'=')){
-			color = 'green';
-
+		//Eq foot==bicycle
+		if(this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"highway","cycleway",'=')
+				&& this._checkTag(el.tags,"segregated","yes",'!=')){
+			color = this.options.wayColors.shared;
+		}else if(this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"bicycle","designated",'=')
+				&& this._checkTag(el.tags,"segregated","yes",'!=')){
+			color = this.options.wayColors.shared;
+		}else if(this._checkTag(el.tags,"highway","footway",'=') && this._checkTag(el.tags,"bicycle","yes",'=') ){
+			color = this.options.wayColors.shared;
 		}
-		if(this._checkTag(el.tags,"cycleway:right","lane",'=')){
-			color = 'green';
+		//designated
+		else if(this._checkTag(el.tags,"bicycle","designated",'=')
+			|| this._checkTag(el.tags,"highway","cycleway",'=')){
+			color = this.options.wayColors.cycleway;
 		}
-
-		if(this._checkTag(el.tags,"cycleway","lane",'='))
-			color = 'green';
-
-		if(this._checkTag(el.tags,"cycleway:left","opposite_lane",'=')){
-			color = 'orange';
-		}
-
-		if(this._checkTag(el.tags,"cycleway:right","opposite_lane",'=')){
-			color = 'orange';
+		//opposite_lanes
+		else if(this._checkTag(el.tags,"cycleway:left","opposite_lane",'=')
+			|| this._checkTag(el.tags,"cycleway:right","opposite_lane",'=')
+			|| this._checkTag(el.tags,"cycleway","opposite_lane",'=')){
+			color = this.options.wayColors.opposite_lane;
 		}
 
-		if(this._checkTag(el.tags,"cycleway","opposite_lane",'='))
-			color = 'orange';
+		//lanes
+		else if(this._checkTag(el.tags,"cycleway:left","lane",'=') || this._checkTag(el.tags,"cycleway:right","lane",'=')
+			|| this._checkTag(el.tags,"cycleway","lane",'=') || this._checkTag(el.tags,"bicycle:lanes","designated",'~')){
+			color = this.options.wayColors.lane;
+		}
 
-		if(this._checkTag(el.tags,"highway","cycleway",'='))
-			color = 'red';
-		if(this._checkTag(el.tags,"bicycle","designated",'='))
-			color = 'red';
-
-		if(this._checkTag(el.tags,"highway","footway",'=') && this._checkTag(el.tags,"bicycle","yes",'=') )
-			color = 'purple';
-
-		if(this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"bicycle","designated",'=') && this._checkTag(el.tags,"segregated","yes",'!='))
-			color = 'purple';
-		if(this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"highway","cycleway",'=') && this._checkTag(el.tags,"segregated","yes",'!='))
-			color = 'purple';
+		else if(this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","yes",'=')
+			|| this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","-1",'=')){
+			color = this.options.wayColors.noneway;
+		}
 
 		this._addLanes(ll,el);
 
