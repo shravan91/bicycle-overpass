@@ -47,11 +47,12 @@ L.OwnLayersPack = L.Class.extend({
 		this._addWayPart();
 		this.wayzoomlevel = 18;
 		this._waysZoomedLayer = L.featureGroup();
+		console.log(this.options.map);
 		this.options.map.on("zoomend",function(){
-				if(_this.options.map.getZoom() < _this.wayzoomlevel){
+				if(_this.options.map.getZoom() < _this.wayzoomlevel && _this.options.map.hasLayer(_this._waysZoomedLayer) ){
 					_this._hideLayer(_this._waysZoomedLayer);
 					_this._showLayer(_this._wayLayer);
-				}else{
+				}else if(_this.options.map.hasLayer(_this._waysLayer)){
 					_this._showLayer(_this._waysZoomedLayer);
 					_this._hideLayer(_this._wayLayer);
 				}
@@ -154,6 +155,7 @@ L.OwnLayersPack = L.Class.extend({
 				'way["cycleway:lanes"~"designated"](%BBOX%);'+
 				//cycleways
 				'way["highway"="cycleway"](%BBOX%);'+
+				'way["highway"="footway"]["bicycle"="yes"](%BBOX%);'+
 				'way["bicycle"="designated"](%BBOX%););out geom;';
 		var _this = this;
 	 	this._wayfetcher = new L.OverpassFetcher({
@@ -201,6 +203,8 @@ L.OwnLayersPack = L.Class.extend({
 	},
 
 	_addLanes: function(ll,el){
+		//TODO I CAN DO IT MUCH BETTER
+
 		if(this._checkTag(el.tags,"bicycle:lanes","designated","~")){
 			var lanes = el.tags["bicycle:lanes"].split("|");
 			var i = 0;
@@ -217,15 +221,118 @@ L.OwnLayersPack = L.Class.extend({
 				n.setStyle({'color': color,'opacity':1,'weight':8});
 				n.setOffset((i-lanes.length/2+1)*10);
 				this._waysZoomedLayer.addLayer(n);
+				if(color=='black'){
+					n.bringToBack();
+				}
 				++i;
 			}
 		}
+//CYCLEWAY with foot
+		else if((this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"bicycle","designated",'=') ) ||
+			 (this._checkTag(el.tags,"highway","footway",'=') && this._checkTag(el.tags,"bicycle","yes",'=')) ){
+			if(this._checkTag(el.tags,"segregated","yes",'!=')){
+				var n = L.polyline( ll);
+				n.setStyle({'color': 'yellow','opacity':1,'weight':8});
+				n.setOffset(-5);
+				this._waysZoomedLayer.addLayer(n);
+
+				var n = L.polyline( ll);
+				n.setStyle({'color': 'yellow','opacity':1,'weight':8});
+				n.setOffset(5);
+				this._waysZoomedLayer.addLayer(n);
+			}else{
+				var n = L.polyline( ll);
+				n.setStyle({'color': 'blue','opacity':1,'weight':8});
+				this._waysZoomedLayer.addLayer(n);
+			}
+		}
+
+//CYCLE WAYS
+		else if(this._checkTag(el.tags,"highway","cycleway",'=') || this._checkTag(el.tags,"bicycle","designated",'=')){
+			var n = L.polyline( ll);
+			n.setStyle({'color': 'red','opacity':1,'weight':8});
+			n.setOffset((lanes/2+1)*10);
+			this._waysZoomedLayer.addLayer(n);
+//OPPOSITE LANES
+		}else if(this._checkTag(el.tags,"cycleway:right","opposite_lane",'=')){
+			var lanes = el.tags["lanes"];
+			if(lanes == undefined) lanes = 1;
+
+			var n = L.polyline( ll);
+			n.setStyle({'color': 'red','opacity':1,'weight':8});
+			n.setOffset((lanes/2+1)*10);
+			this._waysZoomedLayer.addLayer(n);
+
+			for(var i=0;i<lanes;i++){
+				var w = L.polyline( ll);
+				w.setStyle({'color': 'black','opacity':1,'weight':8});
+				w.setOffset((i-lanes/2+1)*10);
+				this._waysZoomedLayer.addLayer(w);
+				w.bringToBack();
+			}
+
+		}else if(this._checkTag(el.tags,"cycleway","opposite_lane",'=') || this._checkTag(el.tags,"cycleway:right","opposite_lane",'=') ){
+			var lanes = el.tags["lanes"];
+			if(lanes == undefined) lanes = 1;
+			for(var i=0;i<lanes;i++){
+				var n = L.polyline( ll);
+				n.setStyle({'color': 'black','opacity':1,'weight':8});
+				n.setOffset((i-lanes/2)*10);
+				this._waysZoomedLayer.addLayer(n);
+			}
+			var n = L.polyline( ll);
+			n.setStyle({'color': 'red','opacity':1,'weight':8});
+			n.setOffset((1-lanes/2)*10);
+			this._waysZoomedLayer.addLayer(n);
+
+//CYCLE LANES
+		}else if(this._checkTag(el.tags,"cycleway:right","lane",'=')){
+			var lanes = el.tags["lanes"];
+			if(lanes == undefined) lanes = 1;
+
+			var n = L.polyline( ll);
+			n.setStyle({'color': 'red','opacity':1,'weight':8});
+			n.setOffset((lanes/2+1)*10);
+			this._waysZoomedLayer.addLayer(n);
+
+			for(var i=0;i<lanes;i++){
+				var w = L.polyline( ll);
+				w.setStyle({'color': 'black','opacity':1,'weight':8});
+				w.setOffset((i-lanes/2+1)*10);
+				this._waysZoomedLayer.addLayer(w);
+			}
+
+		}else if(this._checkTag(el.tags,"cycleway","lane",'=') || this._checkTag(el.tags,"cycleway:right","lane",'=') ){
+			var lanes = el.tags["lanes"];
+			if(lanes == undefined) lanes = 1;
+			for(var i=0;i<lanes;i++){
+				var n = L.polyline( ll);
+				n.setStyle({'color': 'black','opacity':1,'weight':8});
+				n.setOffset((i-lanes/2)*10);
+				this._waysZoomedLayer.addLayer(n);
+			}
+			var n = L.polyline( ll);
+			n.setStyle({'color': 'red','opacity':1,'weight':8});
+			n.setOffset((1-lanes/2)*10);
+			this._waysZoomedLayer.addLayer(n);
+//ONEWAY
+		}else if(this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","yes",'=') ){
+			//TODO
+			var n = L.polyline( ll);
+			n.setStyle({'color': 'blue','opacity':1,'weight':8});
+			this._waysZoomedLayer.addLayer(n);
+		}else if(this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","-1",'=')){
+			var n = L.polyline( ll);
+			n.setStyle({'color': 'blue','opacity':1,'weight':8});
+			this._waysZoomedLayer.addLayer(n);
+		}
+
 	},
 
 	_createWay: function(ll,el){
 		var feature = L.polyline( ll);
 		var color = "blue";
-
+		//TODO I CAN DO IT MUCH BETTER
 		if(this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","yes",'='))
 			color = 'yellow';
 		if(this._checkTag(el.tags,"oneway:bicycle","no",'=') && this._checkTag(el.tags,"oneway","-1",'='))
@@ -257,6 +364,9 @@ L.OwnLayersPack = L.Class.extend({
 			color = 'red';
 		if(this._checkTag(el.tags,"bicycle","designated",'='))
 			color = 'red';
+
+		if(this._checkTag(el.tags,"highway","footway",'=') && this._checkTag(el.tags,"bicycle","yes",'=') )
+			color = 'purple';
 
 		if(this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"bicycle","designated",'=') && this._checkTag(el.tags,"segregated","yes",'!='))
 			color = 'purple';

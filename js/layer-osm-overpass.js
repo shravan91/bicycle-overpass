@@ -235,6 +235,7 @@ L.OverpassFetcher = L.LayerGroup.extend({
 		return ret_arr;
 	},
 	onMoveEnd: function(map) {
+		if(this._map == undefined) return;
 		if(this._map.getZoom() < this.options.minZoom)
 			return;
 		var bounds=this._map.getBounds();

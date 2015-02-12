@@ -138,7 +138,7 @@ function afterInit(){
 		box.setText('<div class="pois-sprite pois-sprite-hazard__bicycle"></div><i id="#text-leg" class="legend-text" data-i18n="Hazard"></i>');
 		$(".legend-text").i18n();
 	});
-	$("#nav-pois").on("s_change",function(){
+	$("#nav-hazards").on("s_change",function(){
 		if($(this).hasClass("ui-btn-active"))ownLayers.showHazardLayer();
 		else ownLayers.hideHazardLayer();
 	});
