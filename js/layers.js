@@ -221,9 +221,6 @@ L.OwnLayersPack = L.Class.extend({
 				n.setStyle({'color': color,'opacity':1,'weight':8});
 				n.setOffset((i-lanes.length/2+1)*10);
 				this._waysZoomedLayer.addLayer(n);
-				if(color=='black'){
-					n.bringToBack();
-				}
 				++i;
 			}
 		}
