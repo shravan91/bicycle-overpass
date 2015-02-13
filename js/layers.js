@@ -211,15 +211,17 @@ L.OwnLayersPack = L.Class.extend({
 			var i = 0;
 			for(var lane in lanes){
 				var n = L.polyline( ll);
-				var color;
+				var color;var opacity = 0.8;
 				if(lanes[lane] == 'no')
 					color = 'black';
 				else if(lanes[lane] == 'yes')
 					color = 'blue';
-				else if(lanes[lane] == 'designated')
+				else if(lanes[lane] == 'designated'){
 					color = 'red';
+					opacity = 1;
+				}
 
-				n.setStyle({'color': color,'opacity':1,'weight':8});
+				n.setStyle({'color': color,'opacity':opacity,'weight':8});
 				n.setOffset((i-lanes.length/2+1)*10);
 				this._waysZoomedLayer.addLayer(n);
 				++i;
@@ -289,11 +291,11 @@ L.OwnLayersPack = L.Class.extend({
 			console.log(el);
 			for(var i=0;i<lanesP.length;++i){
 				var n = L.polyline(ll);
-				var color = 'blue';
+				var color = 'blue';var opacity = 0.8;
 				if(lanesP[i].type == 'c') color = 'black';
-				else if(lanesP[i].type == 'b') color = 'red';
+				else if(lanesP[i].type == 'b') {color = 'red'; opacity:1;}
 				else if(lanesP[i].type == 'f') color = 'yellow';
-				n.setStyle({'color': color,'opacity':1,'weight':8});
+				n.setStyle({'color': color,'opacity':opacity,'weight':8});
 				n.setOffset((i-lanesP.length/2+1)*10);
 				this._waysZoomedLayer.addLayer(n);
 			}
@@ -337,9 +339,24 @@ L.OwnLayersPack = L.Class.extend({
 			color = this.options.wayColors.noneway;
 		}
 
+		var dasharray = "6, 5";
+
+		if(this._checkTag(el.tags,"cycleway:surface","paving_stones",'=')
+			|| this._checkTag(el.tags,"cycleway:left:surface","paving_stones",'=')
+			|| this._checkTag(el.tags,"cycleway:right:surface","paving_stones",'=')){
+				dasharray = "2, 3";
+		}else if(this._checkTag(el.tags,"cycleway:surface","asphalt",'=')
+			|| this._checkTag(el.tags,"cycleway:left:surface","asphalt",'=')
+			|| this._checkTag(el.tags,"cycleway:right:surface","asphalt",'=')){
+				dasharray = 1;
+		}else if(this._checkTag(el.tags,"surface","paving_stones",'=')){
+				dasharray = "2, 3";
+		}else if(this._checkTag(el.tags,"surface","asphalt",'=')){
+				dasharray = 1;
+		}
 		this._addLanes(ll,el);
 
-		feature.setStyle({'color':color, 'opacity':1});
+		feature.setStyle({'color':color, 'opacity':1,dashArray:dasharray, weight: 2});
 		return feature;
 	},
 	_createTrail: function (ll,el){

@@ -117,7 +117,7 @@ function afterInit(){
 	adBox.setText(adString);
 	setInterval(function () {adBox.setText(adString);}, 60000*5);
 
-	var colors = {noneway:"yellow",opposite_lane:"orange",lane: "green", shared:"purple",cycleway:"red"};
+	var colors = {noneway:"blue",opposite_lane:"pink",lane: "yellow", shared:"orange",cycleway:"red"};
 	var ownLayers = new L.OwnLayersPack({map:map,wayColors:colors});
 
 	//POI
