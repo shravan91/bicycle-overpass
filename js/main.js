@@ -73,6 +73,14 @@ function ScaleContentToDevice(){
     $(".ui-content").height(content);
 }
 
+function getLineWithStyle(color,dashArray){
+	var d = "";
+	if(dashArray!=undefined)
+		d = ' stroke-dasharray: '+dashArray;
+	return '<svg width="40" height="10">'+
+			'<line x1="0" y1="5" x2="40" y2="5" style="stroke: '+color+'; stroke-width: 2px; '+d+'"  />'+
+			'</svg>'
+}
 function afterInit(){
 	i18n_gen();
 	var lat  = ( getCookie("lat" ) ? getCookie("lat" ) : 51.5 );
@@ -117,7 +125,7 @@ function afterInit(){
 	adBox.setText(adString);
 	setInterval(function () {adBox.setText(adString);}, 60000*5);
 
-	var colors = {noneway:"blue",opposite_lane:"pink",lane: "yellow", shared:"orange",cycleway:"red"};
+	var colors = {noneway:"blue",opposite_lane:"purple",lane: "yellow", shared:"orange",cycleway:"red"};
 	var ownLayers = new L.OwnLayersPack({map:map,wayColors:colors});
 
 	//POI
@@ -145,11 +153,14 @@ function afterInit(){
 
 	//WAYS
 	$("#nav-cycleways").on("mouseenter",function(){
-		box.setText('<table class="nomargin"><tr><td><p style="color:'+colors.noneway+'">&#9646;</p></td><td><i id="#text-leg" class="legend-text" data-i18n="Not a one-way road for bicycles"></i></td></tr>'+
-			'<tr><td><p style="color:'+colors.opposite_lane+'">&#9646;</p></td><td><i id="#text-leg" class="legend-text" data-i18n="Opposite lane"></i></td></tr>'+
-			'<tr><td><p style="color:'+colors.lane+'">&#9646;</p></td><td><i id="#text-leg" class="legend-text" data-i18n="Lane"></i></td></tr>'+
-			'<tr><td><p style="color:'+colors.shared+'">&#9646;</p></td><td><i id="#text-leg" class="legend-text" data-i18n="Shared cycle way"></i></td></tr>'+
-			'<tr><td><p style="color:'+colors.cycleway+'">&#9646;</p></td><td><i id="#text-leg" class="legend-text" data-i18n="Cycleway"></i></td></tr></table>'
+		box.setText('<p style="line-height: 100%;size:10px;">'+getLineWithStyle(colors.noneway)+'</td><td><i id="#text-leg" class="legend-text" data-i18n="Not a one-way road for bicycles"></i><br/>'+
+			getLineWithStyle(colors.opposite_lane)+'<i id="#text-leg" class="legend-text" data-i18n="Opposite lane"></i><br/>'+
+			getLineWithStyle(colors.lane)+'<i id="#text-leg" class="legend-text" data-i18n="Lane"></i><br/>'+
+			getLineWithStyle(colors.shared)+'<i id="#text-leg" class="legend-text" data-i18n="Shared cycle way"></i><br/>'+
+			getLineWithStyle(colors.cycleway)+'<i id="#text-leg" class="legend-text" data-i18n="Cycleway"></i><br/>'+
+			getLineWithStyle("#000000")+'<i id="#text-leg" class="legend-text" data-i18n="Asphalt"></i><br/>'+
+			getLineWithStyle("#000000",'2 3')+'<i id="#text-leg" class="legend-text" data-i18n="Paving stones"></i><br/>'+
+			getLineWithStyle("#000000",'6 5')+'<i id="#text-leg" class="legend-text" data-i18n="No data"></i></p>'
 			);
 		$(".legend-text").i18n();
 	});
