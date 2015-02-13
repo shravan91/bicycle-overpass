@@ -169,8 +169,8 @@ L.OwnLayersPack = L.Class.extend({
 	},
 
 	hideTrailLayer: function(){
-		this._hideLayer(this._wayLayer);
-		this._hideLayer(this._wayfetcher);
+		this._hideLayer(this._trailLayer);
+		this._hideLayer(this._trailfetcher);
 	},
 
 	showTrailLayer: function(){
@@ -179,7 +179,7 @@ L.OwnLayersPack = L.Class.extend({
 	},
 
 	_addTrailPart: function(){
-		var selector = 'relation[route=bicycle](%BBOX%);out;'+
+		var selector = 'relation["route"~"bicycle|mtb"](%BBOX%);out;'+
 					'way(r)(%BBOX%);out ids tags geom;';
 		var _this = this;
 		this._trailfetcher = new L.OverpassFetcher({
@@ -366,7 +366,10 @@ L.OwnLayersPack = L.Class.extend({
 		for(var rel in el.relations){
 			var n = L.polyline( ll);
 			var color = el.relations[rel].tags["colour"];
-			n.setStyle({'color': color,'opacity':1});
+			if(el.relations[rel].tags["route"] == "mtb")
+				n.setStyle({'color': color,'opacity':1,dashArray:'8 8'});
+			else
+				n.setStyle({'color': color,'opacity':1});
 		
 			n.setOffset((i-rlength+1)*6);
 			array.push(n);
