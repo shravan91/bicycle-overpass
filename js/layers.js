@@ -208,6 +208,9 @@ L.OwnLayersPack = L.Class.extend({
 		//TODO I CAN DO IT MUCH BETTER
 		if(this._checkTag(el.tags,"bicycle:lanes","designated","~")){
 			var lanes = el.tags["bicycle:lanes"].split("|");
+			var lanes_tt;
+			if(el.tags["turn:lanes"]!= undefined)
+			 	lanes_tt = el.tags["turn:lanes"].split("|");
 			var i = 0;
 			for(var lane in lanes){
 				var n = L.polyline( ll);
@@ -223,6 +226,22 @@ L.OwnLayersPack = L.Class.extend({
 
 				n.setStyle({'color': color,'opacity':opacity,'weight':8});
 				n.setOffset((i-lanes.length/2+1)*10);
+				if(lanes_tt != undefined && lanes.length == lanes_tt.length){
+					var text = " ";
+					if(lanes_tt[lane].search("right") > -1){
+						text += ' \u21B1 ';
+					} if(lanes_tt[lane].search("left") > -1){
+						text += ' \u21B0  ';
+					} if(lanes_tt[lane].search("through") > -1){
+						text += '\u2191 ';
+					}
+					n.setText(text, {repeat: true,
+                            offset: -3,
+                            attributes: {fill: '#FFFFFF',
+                                         'font-weight': 'bold',
+                                         'font-size': '10','rotate':'90'}});
+				}
+
 				this._waysZoomedLayer.addLayer(n);
 				++i;
 			}
@@ -231,23 +250,43 @@ L.OwnLayersPack = L.Class.extend({
 			//Footway
 			if(this._checkTag(el.tags,"highway","footway",'=') ){
 				if( this._checkTag(el.tags,"bicycle","yes",'=') || this._checkTag(el.tags,"bicycle","designated",'=') ){
+					var style="twoways";
+					if(this._checkTag(el.tags,"highway","cycleway",'=')
+							&& (this._checkTag(el.tags,"oneway","yes",'=')
+								|| this._checkTag(el.tags,"oneway:bicycle","yes",'=') )) 
+						style="through";
+					if(this._checkTag(el.tags,"highway","cycleway",'=')
+							&& (this._checkTag(el.tags,"oneway","-1",'=')
+								|| this._checkTag(el.tags,"oneway:bicycle","-1",'=') ))
+						style="through";
+
 					if(this._checkTag(el.tags,"segregated","yes",'!=')){
-						lanesP.push({type:'fb'});
+						lanesP.push({type:'fb',symbol:style});
 					}else{
 						lanesP.push({type:'f'});
-						lanesP.push({type:'b'});
+						lanesP.push({type:'b',symbol:style});
 					}
 				}
 			}
 			//Cycleways
 			else if(this._checkTag(el.tags,"highway","cycleway",'=')  || this._checkTag(el.tags,"bicycle","designated",'=') ){
+				var style="twoways";
+				if(this._checkTag(el.tags,"highway","cycleway",'=')
+						&& (this._checkTag(el.tags,"oneway","yes",'=')
+							|| this._checkTag(el.tags,"oneway:bicycle","yes",'=') )) 
+					style="through";
+				if(this._checkTag(el.tags,"highway","cycleway",'=')
+						&& (this._checkTag(el.tags,"oneway","-1",'=')
+							|| this._checkTag(el.tags,"oneway:bicycle","-1",'=') )) 
+					style="through";
+
 				if(this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"segregated","yes",'!=') ){
-					lanesP.push({type:'fb'});
+					lanesP.push({type:'fb',symbol:style });
 				}else if (this._checkTag(el.tags,"foot","designated",'=') && this._checkTag(el.tags,"segregated","yes",'=')){
-					lanesP.push({type:'b'});
+					lanesP.push({type:'b',symbol:style});
 					lanesP.push({type:'f'});
 				}else{
-					lanesP.push({type:'b'});
+					lanesP.push({type:'b',symbol:style});
 				}
 			}
 			//Other
@@ -257,9 +296,9 @@ L.OwnLayersPack = L.Class.extend({
 				if(lanes == undefined) lanes = 1;
 
 				if(this._checkTag(el.tags,"cycleway","opposite_lane",'=') ){
-					lanesP.push({type:'b',symbol:'barrow'});hasOP=true;
+					lanesP.push({type:'b',symbol:'reverse'});hasOP=true;
 				}else if(this._checkTag(el.tags,"cycleway:left","opposite_lane",'=') ){
-					lanesP.push({type:'b',symbol:'barrow'});hasOP=true;
+					lanesP.push({type:'b',symbol:'reverse'});hasOP=true;
 				}
 
 				if(this._checkTag(el.tags,"cycleway","lane",'=') && this._checkTag(el.tags,"oneway","-1",'=')){
@@ -274,9 +313,9 @@ L.OwnLayersPack = L.Class.extend({
 
 				if(!hasOP){
 					if(this._checkTag(el.tags,"cycleway","opposite_lane",'=') && this._checkTag(el.tags,"oneway","-1",'=')){
-						lanesP.push({type:'b',symbol:'arrow'});
+						lanesP.push({type:'b',symbol:'through'});
 					}else if(this._checkTag(el.tags,"cycleway:right","opposite_lane",'=') ){
-						lanesP.push({type:'b',symbol:'arrow'});
+						lanesP.push({type:'b',symbol:'through'});
 					}
 				}
 
@@ -287,10 +326,27 @@ L.OwnLayersPack = L.Class.extend({
 				}
 			}
 
-			console.log(lanesP.join(','));
-			console.log(el);
 			for(var i=0;i<lanesP.length;++i){
 				var n = L.polyline(ll);
+				var text ="  ";
+				if(lanesP[i].symbol != undefined){
+					if(lanesP[i].symbol.search("right") > -1){
+							text += ' \u21B1 ';
+					} if(lanesP[i].symbol.search("left") > -1){
+							text += ' \u21B0  ';
+					} if(lanesP[i].symbol.search("through") > -1){
+							text += '\u2191 ';
+					} if(lanesP[i].symbol.search("reverse") > -1){
+							text += '\u2193 ';
+					} if(lanesP[i].symbol.search("twoways") > -1){
+							text += '\u2195 ';
+					}
+				}
+				n.setText(text, {repeat: true,
+                            offset: -3,
+                            attributes: {fill: '#FFFFFF',
+                                         'font-weight': 'bold',
+                                         'font-size': '10','rotate':'90'}});
 				var color = 'blue';var opacity = 0.8;
 				if(lanesP[i].type == 'c') color = 'black';
 				else if(lanesP[i].type == 'b') {color = 'red'; opacity:1;}
