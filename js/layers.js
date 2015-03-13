@@ -6,6 +6,40 @@ Object.size = function(obj) {
 	return size;
 };
 
+L.FeatureGroup.prototype.hideAll = function (){
+	if(this._hidden) return;
+	this._hidden = true;
+	this.eachLayer(function (layer) {
+		if(layer._path)
+    		layer._path.setAttribute('display', 'none');
+	});
+}
+
+L.FeatureGroup.prototype.showAll = function (){
+	if(!this._hidden) return;
+	this._hidden = false;
+	this.eachLayer(function (layer) {
+		if(layer._path)
+    		layer._path.setAttribute('display', '');
+	});
+}
+
+L.FeatureGroup.prototype._old_addLayer = L.FeatureGroup.prototype.addLayer;
+
+L.FeatureGroup.prototype.addLayer = function (layer){
+	L.FeatureGroup.prototype._old_addLayer.call(this, layer);
+	if(this._hidden && layer._path){
+		layer._path.setAttribute('display', 'none');
+	}
+}
+
+L.FeatureGroup.prototype.isShowed = function (){
+	if(this._hidden == undefined || this._hidden == false){
+		return true;
+	}
+	return false;
+}
+
 L.OwnLayersPack = L.Class.extend({
 	options: {
 		wayColors: {noneway:"yellow",opposite_lane:"orange",lane: "green", shared:"purple",cycleway:"red"}
@@ -46,22 +80,32 @@ L.OwnLayersPack = L.Class.extend({
 		this._wayLayer = L.featureGroup();
 		this._addWayPart();
 		this.wayzoomlevel = 18;
-		this._waysZoomedLayer = L.featureGroup();
-		console.log(this.options.map);
+
+		this._waysZoomedLayer = L.extractLayer({onDraw: function(layer){_this._addLanes(layer);},layer:this._wayLayer,minZoom:this.wayzoomlevel});
+
+		this._showLayer(this._wayLayer);
+		this._showLayer(this._waysZoomedLayer);
+
 		this.options.map.on("zoomend",function(){
 				if(_this.options.map.getZoom() < _this.wayzoomlevel ){
-					if(_this.options.map.hasLayer(_this._waysZoomedLayer)){
-						_this._hideLayer(_this._waysZoomedLayer);
-						_this._showLayer(_this._wayLayer);
-					}
-				}else if(_this.options.map.hasLayer(_this._wayLayer)){
-					_this._showLayer(_this._waysZoomedLayer);
-					_this._hideLayer(_this._wayLayer);
+					_this._showAllOnLayer(_this._wayLayer);
+				}else{
+					_this._hideAllOnLayer(_this._wayLayer);
 				}
 			});
 		//Trail
 		this._trailLayer = L.featureGroup();
 		this._addTrailPart();
+	},
+
+	_hideAllOnLayer: function(layer){
+		if(layer.isShowed())
+			layer.hideAll();
+	},
+
+	_showAllOnLayer: function(layer){
+		if(!layer.isShowed())
+			layer.showAll();
 	},
 
 	_hideLayer: function(layer){
@@ -129,16 +173,16 @@ L.OwnLayersPack = L.Class.extend({
 	},
 
 	hideWayLayer: function(){
-		this._hideLayer(this._waysZoomedLayer);
-		this._hideLayer(this._wayLayer);
+		this._hideAllOnLayer(this._waysZoomedLayer);
+		this._hideAllOnLayer(this._wayLayer);
 		this._hideLayer(this._wayfetcher);
 	},
 
 	showWayLayer: function(){
 		if(this.options.map.getZoom() >= this.wayzoomlevel)
-			this._showLayer(this._waysZoomedLayer);
+			this._showAllOnLayer(this._waysZoomedLayer);
 		else
-			this._showLayer(this._wayLayer);
+			this._showAllOnLayer(this._wayLayer);
 		this._showLayer(this._wayfetcher);
 	},
 
@@ -204,7 +248,9 @@ L.OwnLayersPack = L.Class.extend({
 		return false;
 	},
 
-	_addLanes: function(ll,el){
+	_addLanes: function(layer){
+		var el = layer.el;
+		var ll = layer.getLatLngs();
 		//TODO I CAN DO IT MUCH BETTER
 		if(this._checkTag(el.tags,"bicycle:lanes","designated","~")){
 			var lanes = el.tags["bicycle:lanes"].split("|");
@@ -410,7 +456,7 @@ L.OwnLayersPack = L.Class.extend({
 		}else if(this._checkTag(el.tags,"surface","asphalt",'=')){
 				dasharray = 1;
 		}
-		this._addLanes(ll,el);
+		feature.el = el;
 
 		feature.setStyle({'color':color, 'opacity':1,dashArray:dasharray, weight: 2});
 		return feature;
