@@ -83,9 +83,16 @@ function getLineWithStyle(color,dashArray){
 }
 function afterInit(){
 	i18n_gen();
-	var lat  = ( getCookie("lat" ) ? getCookie("lat" ) : 51.5 );
-	var lon  = ( getCookie("lon" ) ? getCookie("lon" ) : 16 );
-	var zoom = ( getCookie("zoom") ? getCookie("zoom") : 5 );
+	console.log(getParameterByName("zoom"));
+	var lat  = (( getParameterByName("lat") != "" ) ? getParameterByName("lat") :
+					( getCookie("lat" ) ? getCookie("lat" ) : 51.5 )
+				);
+	var lon  = (( getParameterByName("lon") != "" ) ? getParameterByName("lon") :
+					( getCookie("lon" ) ? getCookie("lon" ) : 16 )
+				);
+	var zoom = (( getParameterByName("zoom") != "" )?getParameterByName("zoom") :
+					( getCookie("zoom") ? getCookie("zoom") : 5 )
+				);
 	map = L.map('map').setView([lat,lon], zoom);
 	L.tileLayer('http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png', {
 		attribution: $.i18n.t('Map data &copy; %s contributors',"<a href='http://openstreetmap.org'>OSM</a>")+" "+
@@ -117,6 +124,11 @@ function afterInit(){
 			$("#text-zbox-zoomin").css("display","none");
 	});
 	box.setText('<i id="#text-leg" data-i18n="Hover over the button"></i>');
+
+	var permalinkBox = new Box();
+	permalinkBox.setPosition('bottomleft');
+	map.addControl(permalinkBox);
+	permalinkBox.setText("");
 
 	var adBox = new Box();
 	adBox.setPosition('bottomright');
@@ -180,8 +192,6 @@ function afterInit(){
 		else ownLayers.hideTrailLayer();
 	});
 
-
-
 	$(".toogle-button.ui-btn-active").trigger("s_change");
 
 	$(".toogle-button").on('click', function() {
@@ -203,6 +213,8 @@ function afterInit(){
 		setCookie("lat", map.getCenter().lat,64);
 		setCookie("lon", map.getCenter().lng,64);
 		setCookie("zoom",map.getZoom(),     64);
+		permalinkBox.setText("<a rel='external' data-ajax='false' href='http://bicycle.osm24.eu/?lat="+map.getCenter().lat+
+							"&lon="+map.getCenter().lng+"&zoom="+map.getZoom()+"'>Permalink</a>");
 	} );
 
 	map.fire("moveend");
