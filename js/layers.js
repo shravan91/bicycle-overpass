@@ -94,6 +94,7 @@ L.OwnLayersPack = L.Class.extend({
 		this._showLayer(this._waysZoomedLayer);
 
 		this.options.map.on("zoomend",function(){
+				if(!_this.options.map.hasLayer(_this._wayfetcher)) return;
 				if(_this.options.map.getZoom() < _this.wayzoomlevel ){
 					_this._showAllOnLayer(_this._wayLayer);
 				}else{
