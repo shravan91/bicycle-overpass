@@ -81,6 +81,11 @@ function getLineWithStyle(color,dashArray){
 			'<line x1="0" y1="5" x2="40" y2="5" style="stroke: '+color+'; stroke-width: 2px; '+d+'"  />'+
 			'</svg>'
 }
+
+var adBox;
+function closeAd(){
+	map.removeControl(adBox);
+}
 function afterInit(){
 	i18n_gen();
 	console.log(getParameterByName("zoom"));
@@ -130,10 +135,10 @@ function afterInit(){
 	map.addControl(permalinkBox);
 	permalinkBox.setText("");
 
-	var adBox = new Box();
+	adBox = new Box();
 	adBox.setPosition('bottomright');
 	map.addControl(adBox);
-	var adString ='<iframe scrolling="no" style="border: 0; width: 120px; height: 240px;" src="http://coinurl.com/get.php?id=33833&search=bicycle,sport"></iframe>';
+	var adString ='<a onClick="closeAd();">X</a><br/><iframe scrolling="no" style="border: 0; width: 120px; height: 240px;" src="http://coinurl.com/get.php?id=33833&search=bicycle,sport"></iframe>';
 	adBox.setText(adString);
 	setInterval(function () {adBox.setText(adString);}, 60000*5);
 
