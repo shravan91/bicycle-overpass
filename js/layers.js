@@ -13,6 +13,13 @@ Object.size = function(obj) {
 	return size;
 };
 
+var arrows =   {'left':' \u2B0F',
+				'right':' \u2B0E',
+				'through':' \u2192',
+				'reverse':' \u2190',
+				'twoways':' \u27F7'}
+var lanes_font = 'Arial Black';
+
 L.FeatureGroup.prototype.hideAll = function (){
 	if(this._hidden) return;
 	this._hidden = true;
@@ -172,7 +179,7 @@ L.OwnLayersPack = L.Class.extend({
 					layer: this._hazardLayer,
 					createMarker: 	function(e){
 						var pos = new L.LatLng(e.lat, e.lon);
-						marker=new L.MarkerPOI(pos, {element: e,riseOnHover: true});
+						var marker=new L.MarkerPOI(pos, {element: e,riseOnHover: true});
 						if(e.tags["description"] != undefined)
 							marker.bindLabel(e.tags["description"]);
 						return marker;
@@ -260,6 +267,7 @@ L.OwnLayersPack = L.Class.extend({
 
 	_addLanes: function(layer){
 		var el = layer.el;
+		var size = (this.options.map.getZoom()-17);
 		var ll = layer.getLatLngs();
 		//TODO I CAN DO IT MUCH BETTER
 		if(this._checkTag(el.tags,"bicycle:lanes","designated","~") || 
@@ -292,7 +300,7 @@ L.OwnLayersPack = L.Class.extend({
 
 			if(pars.length == 0){
 				var n = L.polyline( ll);
-				n.setStyle({'color': 'yellow','weight':8});
+				n.setStyle({'color': 'yellow','weight':8*size});
 				this._waysZoomedLayer.addLayer(n);
 			}
 
@@ -313,22 +321,23 @@ L.OwnLayersPack = L.Class.extend({
 					text += '';
 				else{
 					if(pars[i]['turn'].search("right") > -1)
-						text += ' \u21B1 ';
+						text += arrows['right'];
 					if(pars[i]['turn'].search("left") > -1)
-						text += ' \u21B0  ';
+						text += arrows['left'];
 					if(pars[i]['turn'].search("through") > -1)
-						text += '\u2191 ';
+						text += arrows['through'];
 
 					n.setText(text, {repeat: true,
-                            offset: -3,
+                            offset: 3*size,
                             attributes: {fill: '#FFFFFF',
-                                         'font-weight': 'bold',
-                                         'font-size': '10','rotate':'90'}});
+										'font-weight': 'bold',
+										'font-family': lanes_font,
+										'font-size': 10*size}});
 					
 				}
 				console.log(pars[i]);
-				n.setStyle({'color': color,'opacity':opacity,'weight':8});
-				n.setOffset((i-pars.length/2+1)*10);
+				n.setStyle({'color': color,'opacity':opacity,'weight':8*size});
+				n.setOffset((i-pars.length/2+1)*10*size);
 
 				this._waysZoomedLayer.addLayer(n);
 			}
@@ -418,28 +427,29 @@ L.OwnLayersPack = L.Class.extend({
 				var text ="  ";
 				if(lanesP[i].symbol != undefined){
 					if(lanesP[i].symbol.search("right") > -1){
-							text += ' \u21B1 ';
+							text += arrows['right'];
 					} if(lanesP[i].symbol.search("left") > -1){
-							text += ' \u21B0  ';
+							text += arrows['left'];
 					} if(lanesP[i].symbol.search("through") > -1){
-							text += '\u2191 ';
+							text += arrows['through'];
 					} if(lanesP[i].symbol.search("reverse") > -1){
-							text += '\u2193 ';
+							text += arrows['reverse'];
 					} if(lanesP[i].symbol.search("twoways") > -1){
-							text += '\u2195 ';
+							text += arrows['twoways'];
 					}
 				}
 				n.setText(text, {repeat: true,
-                            offset: -3,
+                            offset: 3*size,
                             attributes: {fill: '#FFFFFF',
-                                         'font-weight': 'bold',
-                                         'font-size': '10','rotate':'90'}});
+										'font-weight': 'bold',
+										'font-family': lanes_font,
+										'font-size': 10*size}});
 				var color = 'blue';var opacity = 0.8;
 				if(lanesP[i].type == 'c') color = 'black';
 				else if(lanesP[i].type == 'b') {color = 'red'; opacity:1;}
 				else if(lanesP[i].type == 'f') color = 'yellow';
-				n.setStyle({'color': color,'opacity':opacity,'weight':8});
-				n.setOffset((i-lanesP.length/2+1)*10);
+				n.setStyle({'color': color,'opacity':opacity,'weight':8*size});
+				n.setOffset((i-lanesP.length/2+1)*10*size);
 				this._waysZoomedLayer.addLayer(n);
 			}
 		}

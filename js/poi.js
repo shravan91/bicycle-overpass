@@ -7,20 +7,22 @@ for (var sSheet = 0; sSheet < sSheetList.length; sSheet++){
 		var ruleList = document.styleSheets[sSheet].cssRules;
 		var stringT = "";
 		var n = 0;
-		for (var rule = 0; rule < ruleList.length; rule ++){
-			stringT = ruleList[rule].selectorText.substr(classname.length+1);
-			stringT = stringT.replace("__",":");
-			n = stringT.indexOf("-");
-			if(n > -1){
-				var key = stringT.substr(0,n);
-				var value = stringT.substr(n+1);
-				if(!poisicons.hasOwnProperty(key))
-					poisicons[key]=[];
-				poisicons[key].push(value);
-			}else{
-				if(!poisicons.hasOwnProperty(stringT))
-					poisicons[stringT]=[];
-				poisicons[stringT].push("*");
+		if(ruleList != undefined){
+			for (var rule = 0; rule < ruleList.length; rule ++){
+				stringT = ruleList[rule].selectorText.substr(classname.length+1);
+				stringT = stringT.replace("__",":");
+				n = stringT.indexOf("-");
+				if(n > -1){
+					var key = stringT.substr(0,n);
+					var value = stringT.substr(n+1);
+					if(!poisicons.hasOwnProperty(key))
+						poisicons[key]=[];
+					poisicons[key].push(value);
+				}else{
+					if(!poisicons.hasOwnProperty(stringT))
+						poisicons[stringT]=[];
+					poisicons[stringT].push("*");
+				}
 			}
 		}
 	}
